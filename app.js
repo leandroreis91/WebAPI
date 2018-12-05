@@ -20,6 +20,7 @@ app.use(express.static(__dirname + '/public'));
 //controllers
 var actorCtrl = require('./server/controllers/actor.js')
 var movieCtrl = require('./server/controllers/movie.js')
+var directorCtrl = require('./server/controllers/director.js')
 
 
 //router
@@ -65,7 +66,6 @@ app.get('/movies', function(req, res) {
 	});
 });
 
-
 app.get('/movie/:id', function(req, res) {	
 	var id = req.params["id"];
 	movieCtrl.readBySlug(id, function(resp) {
@@ -90,7 +90,7 @@ app.post('/auth/signin/fb', function (req, res) {
 		method:'GET',
 		contentType: 'application/json'
 	};
-
+	
 	request(options, function (error, response, body) { 
 		if (response.statusCode != 200) { 
 			res.status(response.statusCode).json({ 'statusCode':response.statusCode, 'result': { 'message':'Não foi possível logar com o Facebook'}}) 
@@ -98,7 +98,7 @@ app.post('/auth/signin/fb', function (req, res) {
 		}else{
 			var json = JSON.parse(body);
 			console.log(json);
-
+			
 			res.status(200).json({
 				'statusCode':200,
 				'result' : {
@@ -111,3 +111,116 @@ app.post('/auth/signin/fb', function (req, res) {
 	}); 
 }); 
 
+/* cadastro, edição e remoção de Filmes (CRUD) */
+/* Lista Filmes */
+app.get('/movies', function(req, res) {
+	movieCtrl.readAll(function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});
+
+/* Insere filme */
+app.post('/movie', function(req, res) {
+	var body = req.body;
+	movieCtrl.insert(body, function(resp){
+		res.status(resp.statusCode).json(resp)
+	});
+});
+
+/* Busca, Atualiza e Deleta filme por ID */
+app.route('/movie/:id')
+.get(function(req, res) {	//TROCAR O DETALHE DO FILME
+	var id = req.params["id"];
+	movieCtrl.readBySlug(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.put(function(req, res) {	
+	var id = req.params["id"];
+	var body = req.body;
+	movieCtrl.update(id, body, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.delete(function(req, res) {	
+	var id = req.params["id"];
+	movieCtrl.delete(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});
+
+/* cadastro, edição e remoção de Diretores (CRUD) */
+/* Lista Diretores */
+app.get('/directors', function(req, res) {
+	directorCtrl.readAll(function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});
+
+/* Insere Diretor */
+app.post('/director', function(req, res) {
+	var body = req.body;
+	directorCtrl.insert(body, function(resp){
+		res.status(resp.statusCode).json(resp)
+	});
+});
+
+/* Busca, Atualiza e Deleta Diretor por ID */
+app.route('/director/:id')
+.get(function(req, res) {	
+	var id = req.params["id"];
+	directorCtrl.readBySlug(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.put(function(req, res) {	
+	var id = req.params["id"];
+	var body = req.body;
+	directorCtrl.update(id, body, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.delete(function(req, res) {	
+	var id = req.params["id"];
+	directorCtrl.delete(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});
+
+/* cadastro, edição e remoção de Atores (CRUD) */
+/* Lista Atores */
+app.get('/actors', function(req, res) {
+	actorCtrl.readAll(function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});
+
+/* Insere Ator */
+app.post('/actor', function(req, res) {
+	var body = req.body;
+	actorCtrl.insert(body, function(resp){
+		res.status(resp.statusCode).json(resp)
+	});
+});
+
+/* Busca, Atualiza e Deleta Ator por ID */
+app.route('/actor/:id')
+.get(function(req, res) {	
+	var id = req.params["id"];
+	actorCtrl.readBySlug(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.put(function(req, res) {	
+	var id = req.params["id"];
+	var body = req.body;
+	actorCtrl.update(id, body, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+})
+.delete(function(req, res) {	
+	var id = req.params["id"];
+	actorCtrl.delete(id, function(resp) {
+		res.status(resp.statusCode).json(resp);
+	});
+});

@@ -3,14 +3,14 @@ var response = require('../util/responseHelper.js');
 var base64 = require('file-base64');
 require('../util/stringExtension.js');
 
-var MovieCtrl = {};
-module.exports = MovieCtrl;
+var DirectorCtrl = {};
+module.exports = DirectorCtrl;
 
 
-//GET /movies - lista todos os filmes
-MovieCtrl.readAll = function(callback){
+//GET /directors - lista todos os diretores
+DirectorCtrl.readAll = function(callback){
 
-  var sql = 'SELECT id, title, photo_url, lenght, released_date FROM Movie';
+  var sql = 'SELECT id, name, photo_url FROM Star WHERE is_director = true';
   var params = null;
 
   database.query(sql, params, 'release', function(err, rows) {
@@ -23,9 +23,9 @@ MovieCtrl.readAll = function(callback){
   });
 };
 
-//GET /movie/:id - lista filme por ID
-MovieCtrl.readBySlug = function(id, callback){
-  var sql = 'SELECT id, title, photo_url, lenght, released_date FROM Movie WHERE id = ? ';
+//GET /director/:id - lista diretor por ID
+DirectorCtrl.readBySlug = function(id, callback){
+  var sql = 'SELECT id, name, photo_url FROM Star WHERE is_director = true AND id = ?';
   var params = [id];
 
   database.query(sql, params, 'release', function(err, rows) {
@@ -38,15 +38,15 @@ MovieCtrl.readBySlug = function(id, callback){
 };
 
 
-//POST /movie - insere filme
-MovieCtrl.insert = function(params, callback){
+//POST /director - insere diretor
+DirectorCtrl.insert = function(params, callback){
   var imageName = params.title.fileNameClean('.jpg');
   base64.decode(params.photo_url, './public/images/' + imageName, function(err, output) {
-    console.log("success insert photo movie");
+    console.log("success insert photo diretor");
   });
   
-  var sql = 'INSERT INTO Movie(title, photo_url, lenght, released_date) VALUES(?,?,?,?)';
-  var params = [params.title, imageName, params.lenght ,params.released_date];
+  var sql = 'INSERT INTO Star(name, photo_url, is_actor, is_director) VALUES(?,?,?,?)';
+  var params = [params.name, imageName, false, true];
 
   database.query(sql, params, 'release', function(err, rows) {
     if (err) {
@@ -55,18 +55,18 @@ MovieCtrl.insert = function(params, callback){
     }
     
     var id = rows.insertId;
-    MovieCtrl.readBySlug(id, callback);
+    DirectorCtrl.readBySlug(id, callback);
   });
 };
 
-//PUT /movie - altera um filme
-MovieCtrl.update = function(id, params, callback){
+//PUT /director/:id - altera um diretor
+DirectorCtrl.update = function(id, params, callback){
   var imageName = params.title.fileNameClean('.jpg');
   base64.decode(params.photo_url, './public/images/' + imageName, function(err, output) {
-    console.log("success update photo movie");
+    console.log("success update photo diretor");
   });
   
-  var sql = 'UPDATE Movie SET title = ?, photo_url = ?, released_date = ? WHERE id = ? ';
+  var sql = 'UPDATE Star SET title = ?, photo_url = ?, released_date = ? WHERE is_director = true AND id = ? ';
   var params = [params.title, imageName, params.released_date, id];
 
   database.query(sql, params, 'release', function(err, rows) {
@@ -75,13 +75,13 @@ MovieCtrl.update = function(id, params, callback){
       return;
     }
     
-    MovieCtrl.readBySlug(id, callback);
+    DirectorCtrl.readBySlug(id, callback);
   });
 };
 
-//DELETE /movie - remove um filme
-MovieCtrl.delete = function(id, callback){
-  var sql = 'DELETE FROM Movie WHERE id = ? ';
+//DELETE /diector/:id - remove um diretor
+DirectorCtrl.delete = function(id, callback){
+  var sql = 'DELETE FROM Star WHERE  is_director = true AND id = ? ';
   var params = [id];
 
   database.query(sql, params, 'release', function(err, rows) {
